@@ -1,0 +1,62 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{utf8}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{booktabs}
+
+\title{\textbf{ULK POLYTECHNIC INSTITUTE}\\[0.5em]\Large Cryptography \& Network Security Technical Report}
+\author{Likambo Kulang John}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Risk Assessment}
+\subsection{Assets, Vulnerabilities, and Consequences}
+A security assessment of the polytechnic institute's infrastructure revealed critical security vulnerabilities across three main assets:
+\begin{itemize}
+    \item \textbf{Student Records Server:} Exposed to unencrypted file transfers (FTP/HTTP) and guest network access, creating a high risk of sensitive student record interception and privacy violations.
+    \item \textbf{Staff Credentials:} Vulnerable to weak password policies, making accounts susceptible to brute-force attacks and unauthorized administrative access.
+    \item \textbf{Server Operating System:} Running outdated software packages, exposing the server to known exploits and potential remote code execution (RCE).
+\end{itemize}
+
+\subsection{Risk Rankings and Recommended Controls}
+\begin{table}[h!]
+\centering
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Risk} & \textbf{Likelihood} & \textbf{Impact} & \textbf{Recommended Control} \\ \midrule
+Guest Network Access & High & High & Network Segmentation \& Firewall Filtering \\
+Weak Staff Passwords & High & Medium & Strong Password Policy \& MFA \\
+Unencrypted Transfers & Medium & High & Enforce SFTP / TLS Encryption \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\section{Encryption and Integrity Application}
+A Python security toolkit (\texttt{toolkit.py}) was developed using the \texttt{cryptography} library to manage file confidentiality and integrity:
+\begin{itemize}
+    \item \textbf{Encryption \& Decryption:} Symmetric Fernet encryption was applied to \texttt{sample\_record.csv}. Decryption tests confirmed exact restoration of original record content.
+    \item \textbf{Integrity Verification:} SHA-256 cryptographic hashing was implemented. Verification tests proved that altered files trigger immediate integrity alerts, while untampered files verify successfully.
+    \item \textbf{Key Safety:} The encryption key (\texttt{secret.key}) is stored locally and excluded from version control via \texttt{.gitignore}.
+\end{itemize}
+
+\section{Network Traffic Filtering}
+Traffic filtering was configured using \texttt{iptables} rules to isolate the server:
+\begin{verbatim}
+sudo iptables -F
+sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+sudo iptables -A INPUT -s 192.168.20.0/24 -j DROP
+sudo iptables -A INPUT -s 192.168.10.0/24 -p tcp --dport 22 -j ACCEPT
+sudo iptables -A INPUT -p tcp --dport 22 -j DROP
+\end{verbatim}
+Testing confirmed that connection requests from the Staff network succeeded, while guest network access and external connection attempts timed out as expected.
+
+\section{Conclusion and Submission}
+The technical controls effectively mitigate unauthorized access, safeguard student data in transit, and isolate sensitive server resources.
+
+\textbf{GitHub Repository URL:} \url{https://github.com/YOUR_GITHUB_USERNAME/cryptography-network-security-exam}
+
+\end{document}
